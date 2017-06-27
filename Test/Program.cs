@@ -11,8 +11,6 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            Console.WriteLine($"A: {Bsdiff.Testing()}");
-            Console.ReadLine();
         }
     }
 }

@@ -1,0 +1,14 @@
+[package]
+name = "bsdiffwrap"
+version = "0.1.0"
+authors = ["PJB3005 <pieterjan.briers@gmail.com>"]
+
+[lib]
+name = "bsdiffwrap"
+crate-type = ["dylib"]
+
+[dependencies]
+bsdiff = "0.1.3"
+libc = "0.2.24"
+bzip2 = "0.3.2"
+byteorder = "1.0.0"

@@ -1,15 +1,13 @@
-﻿using SS14.Shared.Bsdiff;
-using System;
-using System.Collections.Generic;
+﻿using NUnit.Framework;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Test
+namespace SS14.Shared.Bsdiff.UnitTesting
 {
-    class Program
+    [TestFixture]
+    public class TestClass
     {
-        static void Main(string[] args)
+        [Test]
+        public void TestMethod()
         {
             var bytes = new byte[] { 0, 1, 2, 3, 5 };
             var bytes2 = new byte[] { 0, 1, 2, 3, 10 };
@@ -18,8 +16,7 @@ namespace Test
             var result = Bsdiff.ApplyBzip2Patch(bytes, patch);
 
             bool equals = result.OrderBy(a => a).SequenceEqual(bytes2.OrderBy(a => a));
-            Console.WriteLine(equals ? "YES" : "NO");
-            Console.ReadLine();
+            Assert.True(equals);
         }
     }
 }

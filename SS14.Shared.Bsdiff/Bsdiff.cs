@@ -12,13 +12,13 @@ namespace SS14.Shared.Bsdiff
             public Byte* ptr;
         }
 
-        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_diff")]
+        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_diff", CallingConvention = CallingConvention.Cdecl)]
         private static unsafe extern DiffResult Diff(Byte* old, UInt64 oldsize, Byte* newbuf, UInt64 newsize);
 
-        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_patch")]
-        private static unsafe extern Int32 Patch(Byte* old, UInt64 oldsize, Byte* patch, UInt64 patchsize);
+        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_patch", CallingConvention = CallingConvention.Cdecl)]
+        private static unsafe extern DiffResult Patch(Byte* old, UInt64 oldsize, Byte* patch, UInt64 patchsize);
 
-        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_cleanup")]
+        [DllImport("bsdiffwrap.dll", EntryPoint = "bsdiff_bzip2_cleanup", CallingConvention = CallingConvention.Cdecl)]
         private static unsafe extern void Cleanup(DiffResult toclean);
 
         /// <summary>
@@ -56,7 +56,29 @@ namespace SS14.Shared.Bsdiff
 
         public static byte[] ApplyBzip2Patch(byte[] oldFile, byte[] patchFile)
         {
-            throw new NotImplementedException();
+            // Copy the buffers into unmanaged memory where Rust can sanely access them.
+            var oldPtr = Marshal.AllocHGlobal(oldFile.Length);
+            var patchPtr = Marshal.AllocHGlobal(patchFile.Length);
+
+            Marshal.Copy(oldFile, 0, oldPtr, oldFile.Length);
+            Marshal.Copy(patchFile, 0, patchPtr, patchFile.Length);
+
+            byte[] resultbuffer;
+
+            unsafe
+            {
+                var result = Patch((Byte*)oldPtr, (ulong)oldFile.Length, (Byte*)patchPtr, (ulong)patchFile.Length);
+                resultbuffer = new byte[result.length];
+
+                Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
+
+                Cleanup(result);
+            }
+
+            Marshal.FreeHGlobal(oldPtr);
+            Marshal.FreeHGlobal(patchPtr);
+
+            return resultbuffer;
         }
     }
 }

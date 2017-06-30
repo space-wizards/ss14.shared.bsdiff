@@ -76,6 +76,7 @@ pub unsafe extern "C" fn bsdiff_bzip2_patch(
     result
 }
 
+#[no_mangle]
 /// Deallocate the buffer returned by the other two functions since C# can't do it directly.
 pub unsafe extern "C" fn bsdiff_bzip2_cleanup(toclean: DiffResult)
 {
@@ -93,7 +94,7 @@ mod test {
     #[test]
     fn test_it() {
         let mut one = vec![0, 1, 2, 3, 4, 5];
-        let mut two = vec![0, 1, 2, 3, 4, 5];
+        let mut two = vec![0, 1, 2, 3, 4, 10];
 
         unsafe {
             let result = bsdiff_bzip2_diff(one.as_mut_ptr(), one.len() as u64, two.as_mut_ptr(), two.len() as u64);

@@ -29,54 +29,42 @@ namespace SS14.Shared.Bsdiff
         /// <returns>A buffer of bytes containing a bzip2 compressed diff that can be passed to <see cref="ApplyBzip2Patch(byte[], byte[])"/>.</returns>
         public static byte[] GenerateBzip2Diff(byte[] oldFile, byte[] newFile)
         {
-            // Copy the buffers into unmanaged memory where Rust can sanely access them.
-            var oldPtr = Marshal.AllocHGlobal(oldFile.Length);
-            var newPtr = Marshal.AllocHGlobal(newFile.Length);
-
-            Marshal.Copy(oldFile, 0, oldPtr, oldFile.Length);
-            Marshal.Copy(newFile, 0, newPtr, newFile.Length);
-
             byte[] resultbuffer;
 
             unsafe
             {
-                var result = Diff((Byte*)oldPtr, (ulong)oldFile.Length, (Byte*)newPtr, (ulong)newFile.Length);
-                resultbuffer = new byte[result.length];
+                fixed (byte* oldPtr = oldFile)
+                fixed (byte* newPtr = newFile)
+                {
+                    var result = Diff(oldPtr, (ulong)oldFile.Length, newPtr, (ulong)newFile.Length);
+                    resultbuffer = new byte[result.length];
 
-                Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
+                    Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
 
-                Cleanup(result);
+                    Cleanup(result);
+                }
             }
-
-            Marshal.FreeHGlobal(oldPtr);
-            Marshal.FreeHGlobal(newPtr);
 
             return resultbuffer;
         }
 
         public static byte[] ApplyBzip2Patch(byte[] oldFile, byte[] patchFile)
         {
-            // Copy the buffers into unmanaged memory where Rust can sanely access them.
-            var oldPtr = Marshal.AllocHGlobal(oldFile.Length);
-            var patchPtr = Marshal.AllocHGlobal(patchFile.Length);
-
-            Marshal.Copy(oldFile, 0, oldPtr, oldFile.Length);
-            Marshal.Copy(patchFile, 0, patchPtr, patchFile.Length);
-
             byte[] resultbuffer;
 
             unsafe
             {
-                var result = Patch((Byte*)oldPtr, (ulong)oldFile.Length, (Byte*)patchPtr, (ulong)patchFile.Length);
-                resultbuffer = new byte[result.length];
+                fixed (byte* oldPtr = oldFile)
+                fixed (byte* patchPtr = patchFile)
+                { 
+                    var result = Patch(oldPtr, (ulong)oldFile.Length, patchPtr, (ulong)patchFile.Length);
+                    resultbuffer = new byte[result.length];
 
-                Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
+                    Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
 
-                Cleanup(result);
+                    Cleanup(result);
+                }
             }
-
-            Marshal.FreeHGlobal(oldPtr);
-            Marshal.FreeHGlobal(patchPtr);
 
             return resultbuffer;
         }

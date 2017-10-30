@@ -29,44 +29,39 @@ namespace SS14.Shared.Bsdiff
         /// <returns>A buffer of bytes containing a bzip2 compressed diff that can be passed to <see cref="ApplyBzip2Patch(byte[], byte[])"/>.</returns>
         public static byte[] GenerateBzip2Diff(byte[] oldFile, byte[] newFile)
         {
-            byte[] resultbuffer;
-
             unsafe
             {
                 fixed (byte* oldPtr = oldFile)
                 fixed (byte* newPtr = newFile)
                 {
                     var result = Diff(oldPtr, (ulong)oldFile.Length, newPtr, (ulong)newFile.Length);
-                    resultbuffer = new byte[result.length];
+                    var resultbuffer = new byte[result.length];
 
                     Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
 
                     Cleanup(result);
+
+                    return resultbuffer;
                 }
             }
-
-            return resultbuffer;
         }
 
         public static byte[] ApplyBzip2Patch(byte[] oldFile, byte[] patchFile)
         {
-            byte[] resultbuffer;
-
             unsafe
             {
                 fixed (byte* oldPtr = oldFile)
                 fixed (byte* patchPtr = patchFile)
                 { 
                     var result = Patch(oldPtr, (ulong)oldFile.Length, patchPtr, (ulong)patchFile.Length);
-                    resultbuffer = new byte[result.length];
+                    var resultbuffer = new byte[result.length];
 
                     Marshal.Copy((IntPtr)result.ptr, resultbuffer, 0, (int)result.length);
 
                     Cleanup(result);
+                    return resultbuffer;
                 }
             }
-
-            return resultbuffer;
         }
     }
 }

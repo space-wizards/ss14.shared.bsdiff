@@ -15,11 +15,12 @@ namespace SS14.Shared.Bsdiff.UnitTesting
             var bytes = new byte[] { 0, 1, 2, 3, 5 };
             var bytes2 = new byte[] { 0, 1, 2, 3, 10 };
 
-            var patch = Bsdiff.GenerateBzip2Diff(bytes, bytes2);
-            var result = Bsdiff.ApplyBzip2Patch(bytes, patch);
-
-            bool equals = result.OrderBy(a => a).SequenceEqual(bytes2.OrderBy(a => a));
-            Assert.True(equals);
+            using (var patch = Bsdiff.GenerateBzip2Diff(bytes, bytes2))
+            using (var result = Bsdiff.ApplyBzip2Patch(bytes, patch.ToArray()))
+            {
+                bool equals = result.ToArray().OrderBy(a => a).SequenceEqual(bytes2.OrderBy(a => a));
+                Assert.True(equals);
+            }
         }
 
         [Test]
@@ -40,11 +41,12 @@ namespace SS14.Shared.Bsdiff.UnitTesting
                 }
             }
 
-            var patch = Bsdiff.GenerateBzip2Diff(bytes, bytes2);
-            var result = Bsdiff.ApplyBzip2Patch(bytes, patch);
-
-            bool equals = result.OrderBy(a => a).SequenceEqual(bytes2.OrderBy(a => a));
-            Assert.True(equals);
+            using (var patch = Bsdiff.GenerateBzip2Diff(bytes, bytes2))
+            using (var result = Bsdiff.ApplyBzip2Patch(bytes, patch.ToArray()))
+            {
+                bool equals = result.ToArray().OrderBy(a => a).SequenceEqual(bytes2.OrderBy(a => a));
+                Assert.True(equals);
+            }
         }
     }
 }

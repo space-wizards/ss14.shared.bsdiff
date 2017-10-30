@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SS14.Shared.Bsdiff")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Implementation of a bzip2-wrapped bsdiff for use in SS14.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SS14.Shared.Bsdiff")]

@@ -9,6 +9,6 @@ crate-type = ["dylib"]
 
 [dependencies]
 bsdiff = "0.1.3"
-libc = "0.2.24"
+libc = "0.2.26"
 bzip2 = "0.3.2"
-byteorder = "1.0.0"
+byteorder = "1.2.1"
